@@ -22,8 +22,11 @@ exports.handler = async (event, context) => {
     console.log('running');
 
     const { code } = event.queryStringParameters
+    console.log(code);
     await mongo.connect()
+    console.log('mongo connected');
     const sessions = await mongo.db('chat').collection('sessions')
+    console.log('sessions found');
     const session = await sessions.findOne({ code })
 
     console.log(session);
