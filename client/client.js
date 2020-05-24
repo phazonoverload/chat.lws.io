@@ -22,7 +22,7 @@ const app = new Vue({
     }
   },
   created() {
-    this.enterRoom()
+    // this.enterRoom()
   },
   methods: {
     async enterRoom() {
