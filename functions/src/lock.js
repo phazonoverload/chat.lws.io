@@ -1,7 +1,7 @@
-require('dotenv').config()
+require('dotenv').config();
 
-const { MongoClient } = require('mongodb')
-const mongo = new MongoClient(process.env.DB_URL, { useUnifiedTopology: true })
+const { MongoClient } = require('mongodb');
+const mongo = new MongoClient(process.env.DB_URL, { useUnifiedTopology: true });
 const OpenTok = require("opentok");
 const OT = new OpenTok(process.env.VONAGE_KEY, process.env.VONAGE_SECRET);
 
@@ -19,15 +19,15 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const { code } = event.queryStringParameters
-    await mongo.connect()
-    const sessions = await mongo.db('chat').collection('sessions')
+    const { code, locked } = JSON.parse(event.body);
+    await mongo.connect();
+    const sessions = await mongo.db('chat').collection('sessions');
     const session = await sessions.findOne({ code })
-    if(session) {
-      const token = OT.generateToken(session.sessionId, { role: 'publisher' })
-      return { headers, statusCode: 200, body: JSON.stringify({ ...session, token, apiKey: process.env.VONAGE_KEY}) }
+    if(!session) {
+      return { headers, statusCode: 200, body: JSON.stringify({error: 'No room with code'}) }
     } else {
-      return { headers, statusCode: 200, body: JSON.stringify({ error: 'Code does not exist' }) }
+      await sessions.update({ code }, { $set: { locked } })
+      return { headers, statusCode: 200, body: JSON.stringify({message: 'Updated', status: locked}) }
     }
   } catch(e) {
     console.error('Error', e)

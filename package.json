@@ -12,8 +12,17 @@
   "license": "ISC",
   "dependencies": {
     "encoding": "^0.1.12",
-    "faunadb": "^2.14.0",
+    "mongodb": "^3.5.7",
     "netlify-lambda": "^1.6.3",
-    "opentok": "^2.10.0"
+    "opentok": "^2.10.0",
+    "prompt": "^1.0.0"
+  },
+  "proxy": {
+    "/.netlify/functions": {
+      "target": "http://localhost:9000",
+      "pathRewrite": {
+        "^/\\.netlify/functions": ""
+      }
+    }
   }
 }

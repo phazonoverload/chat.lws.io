@@ -1,0 +1,60 @@
+<!-- TODO: Favicon, Meta, Social Tag -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="landing">
+    <h1>
+      <span class='bg'>
+        <span class="copy">Welcome!</span>
+      </span>
+    </h1>
+    <h1>
+      <span class='bg'>
+        <span class="copy">Everything is fine.</span>
+      </span>
+    </h1>
+    <form id="register">
+      <label for="code">✨ Magic Meeting Code ✨</label>
+      <div class="inputs">
+        <input type="text" id="code" name="code" value="alpha" required>
+        <button>
+          <span class="copy">Teleport to meeting</span>
+        </button>
+      </div>
+    </form>
+    <!-- <ul id="features">
+      <li class="done">Only Kevin can create rooms</li>
+      <li class="done">Only Kevin can create rooms</li>
+    </ul> -->
+  </div>
+  <div id="call">
+    <div id="controls">
+      <h1 id="room-name"></h1>
+      <button id="screenStart">Screen Start</button>
+      <button id="screenEnd">Screen End</button>
+      <button id="lock">Lock</button>
+      <button id="unlock">Unlock</button>
+      <p>Locked: <span id="lock-status"></span></p>
+    </div>
+    <div id="publishers"></div>
+    <div id="subscribers"></div>
+    <div id="chat">
+      <form id="new-message">
+        <input type="text" id="message">
+        <button>Submit</button>
+      </form>
+      <ul id="messages"></ul>
+    </div>
+  </div>
+  <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+  <script src="axios.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>

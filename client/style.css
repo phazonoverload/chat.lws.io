@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Muli:wght@400;800&display=swap');
+
+:root {
+  --blue: #8aabff;
+  --blue__dark: #6980ec;
+  --pink: #fec1ee;
+  --green: #83fdcd;
+  --red: #ffb0b0;
+  --font: 'Muli', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+}
+
+#landing {
+  min-height: 100vh;
+  min-width: 100vw;
+  background: var(--blue);
+  padding: 1rem 1.25rem;
+}
+
+#landing h1 {
+  font-size: 4em;
+  margin-bottom: 0.5em;
+}
+
+#landing h1 .bg {
+  background: white;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  border-radius: 10px;
+}
+
+#landing .copy {
+  display: block;
+  
+}
+
+#landing h1:nth-child(1) .bg {
+  transform: rotate(-1deg);
+  background: var(--pink);
+}
+
+#landing h1:nth-child(1) .copy {
+  transform: rotate(2deg);
+}
+
+#landing h1:nth-child(2) .bg {
+  transform: rotate(1deg);
+  background: var(--green);
+}
+
+#landing h1:nth-child(2) .copy {
+  transform: rotate(-2deg);
+}
+
+#landing form {
+  margin-top: 1em;
+  max-width: 600px;
+}
+
+#landing .inputs {
+  display: grid;
+  grid-template-columns: auto 250px;
+  grid-gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+#landing .inputs * {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+#landing input {
+  font-size: 1.25em;
+  padding: 0.5em;
+  background: white;
+  border: 2px solid white;
+  border-radius: 5px;
+  font-family: var(--font);
+  outline: 0;
+}
+
+#landing input:focus,
+#landing input:active {
+  border-color: var(--blue__dark)
+}
+
+#landing button {
+  font-family: var(--font);
+  font-size: 1.25em;
+  outline: 0;
+  background: transparent;
+  border: 2px solid black;
+  border-radius: 5px;
+  color: black;
+  cursor: pointer;
+  transform: rotate(-2deg);
+  box-shadow: 2px 2px 0 black;
+}
+
+#landing button .copy {
+  transform: rotate(1deg);
+}
+
+#landing button:focus,
+#landing button:hover {
+  background: var(--blue__dark);
+}
+
+#call {
+  display: none;
+}
+
+#publishers {
+  background: var(--pink)
+}
+
+#subscribers {
+  background: var(--red)
+}
+
+#chat {
+  background: var(--green)
+}
+
+@media screen and (max-width: 700px) {
+  #landing h1 {
+    font-size: 2em;
+  }
+  #register {
+    margin-top: 2em !important;
+  }
+  #landing .inputs {
+    grid-template-columns: auto;
+  }
+  #landing button {
+    padding: 0.5em;
+    margin-top: 1em;
+  }
+}
