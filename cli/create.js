@@ -19,5 +19,6 @@ prompt.start();
 prompt.get(properties, async (err, result) => {
   if(err) return console.log(err);
   const { data } = await axios.post('https://chat.lws.io/.netlify/functions/create', result)
-  console.log(data);
+  if(data.error) return console.log(data.error);
+  console.log(`\nPlease join the video call at https://chat.lws.io and use the Magic Meeting Code '${result.code}'`);
 })

@@ -13,6 +13,7 @@ Find out how to build your own at <https://www.nexmo.com/blog/2020/05/22/build-a
 - [x] Rebuild frontend with Vue.js
 - [x] Style call interface
 - [x] CLI interface to create meetings
+- [x] Favicon
 - [ ] Fullscreen and subscribed stream
 - [ ] Mobile-friendly
 - [ ] Web interface to create meetings
@@ -21,7 +22,7 @@ Find out how to build your own at <https://www.nexmo.com/blog/2020/05/22/build-a
 - [ ] Chat - add user name to messages
 - [ ] Lobby view when there's only one person in call
 - [ ] Provide names when joining meeting
-- [ ] Favicon/Meta Tags
+- [ ] Meta Tags
 - [ ] Keyboard use
 - [ ] Screenreader support
 - [ ] Styling to support multiple participants more nicely
