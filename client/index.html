@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>✨ Chat</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+  <title>Everything is fine.</title>
+  <script src="https://kit.fontawesome.com/d6f83eba81.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,33 +25,41 @@
     </div>
     <div id="call" v-if="ui.pane == 'call'">
       <div id="top">
-        <h1 id="room-name"></h1>
+        <h1><span class="bg"><span class="copy">{{ot.state.name}}</span></span></h1>
         <div id="publishers"></div>
         <div id="controls">
-          <div id="screen" v-if="ui.showScreenShare">
-            <button @click="toggleScreenshare">
-              <span v-if="ot.publishers.screen">Screen Stop</span>
-              <span v-else>Screen Start</span>
-            </button>
+          <div id="screen" class='control' v-if="ui.showScreenShare" @click="toggleScreenshare">
+            <span class="fa-stack fa-2x">
+              <i class="fas fa-circle fa-stack-2x"></i>
+              <i class="fas fa-desktop fa-stack-1x" v-if="ot.publishers.screen && ot.publishers.screen.id == null"></i>
+              <i class="fas fa-stop fa-stack-1x" v-else></i>
+            </span>
+            <span class="text">Screen</span>
           </div>
-          <div id="lock">
-            <button @click="toggleLock">
-              <span v-if="ot.state.locked">Unlock</span>
-              <span v-else>Lock</span>
-            </button>
+          <div id="lock" class='control' @click="toggleLock">
+            <span class="fa-stack fa-2x">
+              <i class="fas fa-circle fa-stack-2x"></i>
+              <i class="fas fa-unlock fa-stack-1x" v-if="ot.state.locked"></i>
+              <i class="fas fa-lock fa-stack-1x" v-else></i>
+            </span>
+            <span class="text" v-if="ot.state.locked">Unlock</span>
+            <span class="text" v-else>Lock</span>
           </div>
         </div>
       </div>
-      <div id="subscribers"></div>
-      <div id="chat">
-        <div id="new-message">
-          <input type="text" v-model="messaging.new" @keyup.enter="sendMessage">
+      <div id="main">
+        <div id="subscribers"></div>
+        <div id="chat">
+          <div id="new-message">
+            <input type="text" v-model="messaging.new" @keyup.enter="sendMessage">
+            <small>Press enter to send</small>
+          </div>
+          <ul id="messages">
+            <li v-for="message in messaging.list">{{message}}</li>
+          </ul>
         </div>
-        <ul id="messages">
-          <li v-for="message in messaging.list">{{message}}</li>
-        </ul>
       </div>
-    </div>
+      </div>
     <footer>
       <p>Built using the <a href="https://tokbox.com/developer/">Vonage Video API</a>. <a href="https://github.com/phazonoverload/chat.lws.io">Code on GitHub</a>. <a href="https://www.nexmo.com/blog/2020/05/22/build-a-basic-video-call-platform-with-netlify-functions">Tutorial on Vonage Developer Blog</a>.</p>
     </footer>

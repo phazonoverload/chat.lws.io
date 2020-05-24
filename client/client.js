@@ -6,14 +6,14 @@ const app = new Vue({
       showScreenShare: false,
     },
     landing: {
-      code: 'alpha'
+      code: ''
     },
     ot: {
       state: {},
       session: undefined,
       publishers: {
         camera: undefined,
-        screen: undefined
+        screen: { id: null }
       },
     },
     messaging: {
@@ -22,7 +22,7 @@ const app = new Vue({
     }
   },
   created() {
-    // this.enterRoom()
+    this.enterRoom()
   },
   methods: {
     async enterRoom() {
@@ -100,9 +100,11 @@ const app = new Vue({
       this.ot.session = OT.initSession(apiKey, sessionId);
       
       const { session, publishers } = this.ot;
-      publishers.camera = OT.initPublisher( 'publishers', { insertMode: 'append' }, err => {
-        if(err) alert(err);
-      });
+      publishers.camera = OT.initPublisher( 
+        'publishers',
+        { insertMode: 'append', width: '200px', height: '150px' }, 
+        err => { if(err) alert(err); }
+      );
       session.connect(token, err => {
         if(err) alert(err);
         else session.publish(publishers.camera, err => {
@@ -113,32 +115,48 @@ const app = new Vue({
     listenForSessionEvents() {
       const { session } = this.ot;
       session.on('streamCreated', event => {
-        session.subscribe(event.stream, 'subscribers', { insertMode: 'append' }, err => {
-          if(err) alert(err)
-        });
+        const videoStream = event.stream.channel.find(c => c.type == 'video')
+        const source = videoStream.source;
+        console.log(source); // camera | screen
+        session.subscribe(
+          event.stream, 
+          'subscribers', 
+          { 
+            insertMode: 'append', 
+            width: source == 'screen' ? '200%' : '100%',
+            height: '100%' 
+          }, 
+          err => { if(err) alert(err) }
+        );
       })
       session.on('signal:message', event => {
         this.receiveMessage(event.data)
       })
     },
     sendMessage() {
-      this.ot.session.signal(
-        { type: 'message', data: this.messaging.new },
-        () => { this.messaging.new = '' }
-      )
+      if(this.messaging.new.length > 0) {
+        this.ot.session.signal(
+          { type: 'message', data: this.messaging.new },
+          () => { this.messaging.new = '' }
+        )
+      }
     },
     receiveMessage(message) {
       this.messaging.list.unshift(message)
     },
     toggleScreenshare() {
-      if(!this.ot.publishers.screen) {
+      if(!this.ot.publishers.screen?.stream) {
         this.ot.publishers.screen = OT.initPublisher(
           'publishers', 
-          { insertMode: 'append', videoSource: 'screen', publishAudio: true }
+          { 
+            insertMode: 'append', 
+            videoSource: 'screen', 
+            publishAudio: true,
+            width: '200px', 
+            height: '150px' 
+          }
         );
-        this.ot.session.publish(this.ot.publishers.screen, err => {
-          if(err) alert(err)
-        });
+        this.ot.session.publish(this.ot.publishers.screen);
       } else {
         this.ot.publishers.screen.destroy()
       }
@@ -157,7 +175,7 @@ const app = new Vue({
     baseURL() {
       const h = location.hostname;
       const isLocal = h == '127.0.0.1' || h == 'localhost';
-      return isLocal ? 'http://localhost:9000' : '#'
+      return isLocal ? 'http://localhost:9000' : 'https://chat.lws.io/.netlify/functions'
     }
   }
 })
