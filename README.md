@@ -12,10 +12,10 @@ Find out how to build your own at <https://www.nexmo.com/blog/2020/05/22/build-a
 - [x] Gain access as admin to locked room
 - [x] Rebuild frontend with Vue.js
 - [x] Style call interface
+- [x] CLI interface to create meetings
 - [ ] Fullscreen and subscribed stream
 - [ ] Mobile-friendly
 - [ ] Web interface to create meetings
-- [ ] CLI interface to create meetings
 - [ ] Record calls (incl admin interface for download)
 - [ ] Persist chat between refreshes
 - [ ] Chat - add user name to messages
