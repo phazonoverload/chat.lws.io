@@ -25,21 +25,22 @@ exports.handler = async (event, context) => {
     console.log(code);
     mongo.connect((data) => {
       console.log(data);
+      return { headers, statusCode: 200, body: 'ok' }
     })
     // await mongo.connect()
-    console.log('mongo connected');
-    const sessions = await mongo.db('chat').collection('sessions')
-    console.log('sessions found');
-    const session = await sessions.findOne({ code })
+    // console.log('mongo connected');
+    // const sessions = await mongo.db('chat').collection('sessions')
+    // console.log('sessions found');
+    // const session = await sessions.findOne({ code })
 
-    console.log(session);
+    // console.log(session);
 
-    if(session) {
-      const token = OT.generateToken(session.sessionId, { role: 'publisher' })
-      return { headers, statusCode: 200, body: JSON.stringify({ ...session, token, apiKey: process.env.VONAGE_KEY}) }
-    } else {
-      return { headers, statusCode: 200, body: JSON.stringify({ error: 'Code does not exist' }) }
-    }
+    // if(session) {
+    //   const token = OT.generateToken(session.sessionId, { role: 'publisher' })
+    //   return { headers, statusCode: 200, body: JSON.stringify({ ...session, token, apiKey: process.env.VONAGE_KEY}) }
+    // } else {
+    //   return { headers, statusCode: 200, body: JSON.stringify({ error: 'Code does not exist' }) }
+    // }
   } catch(e) {
     console.error('Error', e)
     return { headers, statusCode: 500, body: 'Error: ' + e }
