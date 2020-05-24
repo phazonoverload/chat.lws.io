@@ -10,6 +10,7 @@ Find out how to build your own at <https://www.nexmo.com/blog/2020/05/22/build-a
 - [x] Basic text chat
 - [x] Lock/unlock rooms
 - [x] Gain access as admin to locked room
+- [x] Rebuild frontend with Vue.js
 - [ ] Style call interface
 - [ ] Mobile-friendly
 - [ ] Web interface to create meetings
@@ -19,3 +20,4 @@ Find out how to build your own at <https://www.nexmo.com/blog/2020/05/22/build-a
 - [ ] Chat - add user name to messages
 - [ ] Lobby view when there's only one person in call
 - [ ] Provide names when joining meeting
+- [ ] Favicon/Meta Tags

@@ -1,5 +1,3 @@
-<!-- TODO: Favicon, Meta, Social Tag -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,47 +7,55 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="landing">
-    <h1>
-      <span class='bg'>
-        <span class="copy">Welcome!</span>
-      </span>
-    </h1>
-    <h1>
-      <span class='bg'>
-        <span class="copy">Everything is fine.</span>
-      </span>
-    </h1>
-    <form id="register">
-      <label for="code">✨ Magic Meeting Code ✨</label>
-      <div class="inputs">
-        <input type="text" id="code" name="code" value="alpha" required>
-        <button>
-          <span class="copy">Teleport to meeting</span>
-        </button>
+  <div id="app">
+    <div id="landing" v-if="ui.pane == 'landing'">
+      <h1><span class='bg'><span class="copy">Welcome!</span></span></h1>
+      <h1><span class='bg'><span class="copy">Everything is fine.</span></span></h1>
+      <div id="register">
+        <label for="code">✨ Magic Meeting Code ✨</label>
+        <div class="inputs">
+          <input type="text" v-model="landing.code" @keyup.enter="enterRoom">
+          <button @click="enterRoom">
+            <span class="copy">Teleport to meeting</span>
+          </button>
+        </div>
       </div>
-    </form>
-  </div>
-  <div id="call">
-    <div id="controls">
-      <h1 id="room-name"></h1>
-      <button id="screenStart">Screen Start</button>
-      <button id="screenEnd">Screen End</button>
-      <button id="lock">Lock</button>
-      <button id="unlock">Unlock</button>
-      <p>Locked: <span id="lock-status"></span></p>
     </div>
-    <div id="publishers"></div>
-    <div id="subscribers"></div>
-    <div id="chat">
-      <form id="new-message">
-        <input type="text" id="message">
-        <button>Submit</button>
-      </form>
-      <ul id="messages"></ul>
+    <div id="call" v-if="ui.pane == 'call'">
+      <div id="top">
+        <h1 id="room-name"></h1>
+        <div id="publishers"></div>
+        <div id="controls">
+          <div id="screen" v-if="ui.showScreenShare">
+            <button @click="toggleScreenshare">
+              <span v-if="ot.publishers.screen">Screen Stop</span>
+              <span v-else>Screen Start</span>
+            </button>
+          </div>
+          <div id="lock">
+            <button @click="toggleLock">
+              <span v-if="ot.state.locked">Unlock</span>
+              <span v-else>Lock</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="subscribers"></div>
+      <div id="chat">
+        <div id="new-message">
+          <input type="text" v-model="messaging.new" @keyup.enter="sendMessage">
+        </div>
+        <ul id="messages">
+          <li v-for="message in messaging.list">{{message}}</li>
+        </ul>
+      </div>
     </div>
+    <footer>
+      <p>Built using the <a href="https://tokbox.com/developer/">Vonage Video API</a>. <a href="https://github.com/phazonoverload/chat.lws.io">Code on GitHub</a>. <a href="https://www.nexmo.com/blog/2020/05/22/build-a-basic-video-call-platform-with-netlify-functions">Tutorial on Vonage Developer Blog</a>.</p>
+    </footer>
   </div>
   <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+  <script src="vue.js"></script>
   <script src="axios.js"></script>
   <script src="client.js"></script>
 </body>

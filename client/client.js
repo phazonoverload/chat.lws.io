@@ -1,146 +1,163 @@
-let session, camera, screen;
-
-const register = document.getElementById("register");
-const landing = document.getElementById("landing");
-const call = document.getElementById("call");
-const screenStart = document.getElementById("screenStart");
-const screenEnd = document.getElementById("screenEnd");
-const newMessage = document.getElementById("new-message");
-const messages = document.getElementById("messages")
-const lock = document.getElementById("lock")
-const unlocked = document.getElementById("unlocked")
-const lockStatus = document.getElementById("lock-status")
-const roomName = document.getElementById("room-name")
-
-register.addEventListener("submit", async event => {
-  try {
-    event.preventDefault();
-
-    // Get token & room info
-    const url = baseURL() + '/session?code=' + register.elements.code.value;
-    const { data: resp } = await axios.post(url);
-    const { sessionId, apiKey, token, name, locked } = resp;
-
-    // Handle errors
-    if(resp.error) return callback(resp.error)
-    if(locked) {
-      const key = prompt('🔒 Room is locked. If you have a key, you can still unlock it.')
-      const { data: result } = await axios.post(baseURL() + '/validate-key', { key })
-      if(!result) return callback('That is not the correct key.')
+const app = new Vue({
+  el: '#app',
+  data: {
+    ui: {
+      pane: 'landing', // 'landing', 'call'
+      showScreenShare: false,
+    },
+    landing: {
+      code: 'alpha'
+    },
+    ot: {
+      state: {},
+      session: undefined,
+      publishers: {
+        camera: undefined,
+        screen: undefined
+      },
+    },
+    messaging: {
+      new: '',
+      list: []
     }
-
-    // Styling changes
-    landing.style.display = 'none'
-    call.style.display = 'block'
-    lockStatus.innerHTML = locked
-    roomName.innerHTML = name
-    
-    // Check if UI should show screensharing
-    const canScreenShare = await checkScreenSharing()
-    if(!canScreenShare) {
-      screenStart.style.display = 'none'
-      screenEnd.style.display = 'none'
-    }
-
-    // Create session
-    session = OT.initSession(apiKey, sessionId);
-    
-    // Create main publisher
-    camera = OT.initPublisher( 'publishers', { insertMode: 'append' }, callback);
-
-    // Publish camera on connection
-    session.connect(token, error => {
-      if(error) callback(error);
-      else session.publish(camera, callback);
-    })
-
-    // Subscribe to new streams
-    session.on('streamCreated', event => {
-      session.subscribe(event.stream, 'subscribers', { insertMode: 'append' }, callback);
-    })
-    
-    // Handle incoming signals
-    session.on('signal:message', event => {
-      newChatMessage(event.data)
-    })
-
-  } catch(err) {
-    callback(err)
-  }
-})
-
-// Screensharing
-
-screenStart.addEventListener('click', event => {
-  screen = OT.initPublisher(
-    'publishers', 
-    { insertMode: 'append', videoSource: 'screen', publishAudio: true }, 
-    callback
-  );
-  session.publish(screen, callback);
-})
-
-screenEnd.addEventListener('click', event => {
-  screen.destroy();
-})
-
-// Text chat
-
-newMessage.addEventListener('submit', event => {
-  event.preventDefault();
-  session.signal(
-    { type: 'message', data: newMessage.elements.message.value },
-    () => { newMessage.elements.message.value = '' }
-  )
-})
-
-const newChatMessage = text => {
-  messages.innerHTML = `<li>${text}</li>` + messages.innerHTML
-}
-
-// Lock/Unlock Room
-
-lock.addEventListener('click', async event => {
-  editLockStatus(true)
-})
-
-unlock.addEventListener('click', async event => {
-  editLockStatus(false)
-})
-
-const editLockStatus = async status => {
-  try {
-    await axios.post(baseURL() + '/lock', { code: register.elements.code.value, locked: status });
-    lockStatus.innerHTML = status
-  } catch(err) {
-    callback(err)
-  }
-}
-
-// Helpers
-
-const baseURL = () => {
-  const h = location.hostname;
-  const isLocal = h == '127.0.0.1' || h == 'localhost';
-  return isLocal ? 'http://localhost:9000' : '#'
-}
-
-const callback = error => {
-  if(error) alert(error);
-}
-
-const checkScreenSharing = () => {
-  return new Promise((resolve, reject) => {
-    try {
-      OT.checkScreenSharingCapability(response => {
-        if (!response.supported || response.extensionRegistered === false || response.extensionInstalled === false) {
-          reject(false);
-        } else {
-          resolve(true)
+  },
+  created() {
+    // this.enterRoom()
+  },
+  methods: {
+    async enterRoom() {
+      try {
+        const code = this.landing.code
+        if(this.checkCodeIsPresent(code)) {
+          await this.getToken()
+          if(await this.checkToken()) {
+            this.changeUIPane('call')
+            await this.checkScreenshare()
+            this.initSession()
+            this.listenForSessionEvents()
+          }
+        }
+      } catch(err) {
+        alert(err)
+      }
+    },
+    checkCodeIsPresent(code) {
+      if(code.length == 0) {
+        alert('You must provide a ✨ Magic Meeting Code ✨')
+        return false
+      } else {
+        return true
+      }
+    },
+    async getToken() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await axios.post(`${this.baseURL}/session?code=${this.landing.code}`)
+          this.ot.state = data;
+          resolve()
+        } catch(err) {
+          reject(err)
         }
       })
-    } catch(err) {
-      reject(err)
+    },
+    async checkToken() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          if(!this.ot.state.sessionId) {
+            alert('Not a valid ✨ Magic Meeting Code ✨')
+            resolve(false)
+          }
+          if(this.ot.state.locked) {
+            const key = prompt('🔒 Room is locked. If you have a key, you can still unlock it.')
+            const { data } = await axios.post(`${this.baseURL}/validate-key`, { key })
+            if(data) {
+              resolve(true)
+            } else {
+              alert('🚫 That is not the right key')
+              resolve(false)
+            }
+          }
+          resolve(true)
+        } catch(err) {
+          reject(err)
+        }
+      })
+    },
+    checkScreenshare() {
+      return new Promise((resolve, reject) => {
+        OT.checkScreenSharingCapability(response => {
+          const s = !(!response.supported || response.extensionRegistered === false || response.extensionInstalled === false);
+          this.ui.showScreenShare = s;
+          resolve(s);
+        })
+      })
+    },
+    changeUIPane(pane) {
+      this.ui.pane = pane
+    },
+    initSession() {
+      const { apiKey, sessionId, token } = this.ot.state;
+      this.ot.session = OT.initSession(apiKey, sessionId);
+      
+      const { session, publishers } = this.ot;
+      publishers.camera = OT.initPublisher( 'publishers', { insertMode: 'append' }, err => {
+        if(err) alert(err);
+      });
+      session.connect(token, err => {
+        if(err) alert(err);
+        else session.publish(publishers.camera, err => {
+          if(err) alert(err);
+        });
+      })
+    },
+    listenForSessionEvents() {
+      const { session } = this.ot;
+      session.on('streamCreated', event => {
+        session.subscribe(event.stream, 'subscribers', { insertMode: 'append' }, err => {
+          if(err) alert(err)
+        });
+      })
+      session.on('signal:message', event => {
+        this.receiveMessage(event.data)
+      })
+    },
+    sendMessage() {
+      this.ot.session.signal(
+        { type: 'message', data: this.messaging.new },
+        () => { this.messaging.new = '' }
+      )
+    },
+    receiveMessage(message) {
+      this.messaging.list.unshift(message)
+    },
+    toggleScreenshare() {
+      if(!this.ot.publishers.screen) {
+        this.ot.publishers.screen = OT.initPublisher(
+          'publishers', 
+          { insertMode: 'append', videoSource: 'screen', publishAudio: true }
+        );
+        this.ot.session.publish(this.ot.publishers.screen, err => {
+          if(err) alert(err)
+        });
+      } else {
+        this.ot.publishers.screen.destroy()
+      }
+    },
+    async toggleLock() {
+      try {
+        const locked = !this.ot.state.locked;
+        await axios.post(`${this.baseURL}/lock`, { code: this.landing.code, locked })
+        this.ot.state.locked = locked;
+      } catch(err) {
+        alert(err)
+      }
+    },
+  },
+  computed: {
+    baseURL() {
+      const h = location.hostname;
+      const isLocal = h == '127.0.0.1' || h == 'localhost';
+      return isLocal ? 'http://localhost:9000' : '#'
     }
-  })
-}
+  }
+})

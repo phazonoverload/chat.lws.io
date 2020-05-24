@@ -6,6 +6,7 @@
   --pink: #fec1ee;
   --green: #83fdcd;
   --red: #ffb0b0;
+  --yellow: #fcf3b0;
   --font: 'Muli', sans-serif;
 }
 
@@ -17,6 +18,23 @@
 
 body {
   font-family: var(--font);
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: block;
+  background: var(--yellow);
+  width: calc(100% - 2em);
+  margin-left: 1em;
+  text-align: center;
+  padding: 0.5em;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+footer a {
+  color: inherit;
 }
 
 #landing {
@@ -61,7 +79,7 @@ body {
   transform: rotate(-2deg);
 }
 
-#landing form {
+#landing #register {
   margin-top: 1em;
   max-width: 600px;
 }
@@ -114,10 +132,6 @@ body {
 #landing button:focus,
 #landing button:hover {
   background: var(--blue__dark);
-}
-
-#call {
-  display: none;
 }
 
 #publishers {
