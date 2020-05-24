@@ -23,7 +23,6 @@ exports.handler = async (event, context) => {
     await mongo.connect()
     const sessions = await mongo.db('chat').collection('sessions')
     const session = await sessions.findOne({ code })
-    await mongo.close()
 
     if(session) {
       const token = OT.generateToken(session.sessionId, { role: 'publisher' })
