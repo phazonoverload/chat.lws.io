@@ -19,10 +19,14 @@ exports.handler = async (event, context) => {
       }
     }
 
+    console.log('running');
+
     const { code } = event.queryStringParameters
     await mongo.connect()
     const sessions = await mongo.db('chat').collection('sessions')
     const session = await sessions.findOne({ code })
+
+    console.log(session);
 
     if(session) {
       const token = OT.generateToken(session.sessionId, { role: 'publisher' })

@@ -17,5 +17,13 @@
     "netlify-lambda": "^1.6.3",
     "opentok": "^2.10.0",
     "prompt": "^1.0.0"
+  },
+  "proxy": {
+    "/.netlify/functions": {
+      "target": "http://localhost:9000",
+      "pathRewrite": {
+        "^/\\.netlify/functions": ""
+      }
+    }
   }
 }
